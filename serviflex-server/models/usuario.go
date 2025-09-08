@@ -10,6 +10,7 @@ type Usuario struct {
 	Tipo              string    `json:"tipo,omitempty"`
 	Telefone          string    `json:"telefone" firestore:"telefone"`
 	FotoURL           string    `json:"fotoUrl" firestore:"fotoURL"`
+	ImagemURL         string    `json:"imagem_url" firestore:"imagem_url"`
 	EstabelecimentoID string    `json:"estabelecimentoId" firestore:"estabelecimentoId,omitempty"` // só se for profissional
 	CriadoEm          time.Time `json:"criadoEm" firestore:"criadoEm"`
 }

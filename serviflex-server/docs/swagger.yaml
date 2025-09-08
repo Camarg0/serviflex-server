@@ -1,0 +1,434 @@
+definitions:
+  controllers.ImagemInput:
+    properties:
+      imagem_url:
+        type: string
+    type: object
+  models.Agendamento:
+    properties:
+      cliente_id:
+        type: string
+      data_hora:
+        type: string
+      id:
+        type: string
+      procedimento:
+        type: string
+      profissional_id:
+        type: string
+    type: object
+  models.Estabelecimento:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      imagem_url:
+        type: string
+      nome:
+        type: string
+    type: object
+  models.Horario:
+    properties:
+      dia_semana:
+        type: string
+      disponivel:
+        type: boolean
+      hora_fim:
+        type: string
+      hora_inicio:
+        type: string
+      id:
+        type: string
+      profissional_id:
+        type: string
+    type: object
+  models.HorarioInput:
+    properties:
+      dias_semana:
+        items:
+          type: string
+        type: array
+      hora_fim:
+        type: string
+      hora_inicio:
+        type: string
+      profissional_id:
+        type: string
+    type: object
+  models.Login:
+    properties:
+      email:
+        type: string
+      senha:
+        type: string
+    type: object
+  models.Procedimento:
+    properties:
+      descricao:
+        type: string
+      duracao_min:
+        type: integer
+      id:
+        type: string
+      imagem_url:
+        type: string
+      nome:
+        type: string
+      preco:
+        type: number
+      profissional_id:
+        type: string
+    type: object
+  models.Usuario:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      nome:
+        type: string
+      senha:
+        type: string
+      tipo:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /agendamentos:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dados do agendamento
+        in: body
+        name: agendamento
+        required: true
+        schema:
+          $ref: '#/definitions/models.Agendamento'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Agendamento'
+      summary: Agendar horário
+      tags:
+      - Cliente
+  /agendamentos/cliente/{id}:
+    get:
+      parameters:
+      - description: ID do cliente
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Agendamento'
+            type: array
+      summary: Listar agendamentos do cliente
+      tags:
+      - Agendamentos
+  /agendamentos/profissional/{id}:
+    get:
+      parameters:
+      - description: ID do profissional
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Agendamento'
+            type: array
+      summary: Listar agendamentos por profissional
+      tags:
+      - Agendamentos
+  /cadastro:
+    post:
+      consumes:
+      - application/json
+      description: Cadastra novo cliente ou profissional no Firestore
+      parameters:
+      - description: Dados do usuário
+        in: body
+        name: usuario
+        required: true
+        schema:
+          $ref: '#/definitions/models.Usuario'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Usuario'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Conflict
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Cadastro de usuário
+      tags:
+      - Autenticação
+  /estabelecimentos:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Estabelecimento'
+            type: array
+      summary: Listar estabelecimentos
+      tags:
+      - Cliente
+  /horarios:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Horário de atendimento
+        in: body
+        name: horario
+        required: true
+        schema:
+          $ref: '#/definitions/models.HorarioInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Criar horários
+      tags:
+      - Horários
+  /horarios/{id}:
+    get:
+      parameters:
+      - description: ID do profissional
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Horario'
+            type: array
+      summary: Listar horários por profissional
+      tags:
+      - Horários
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Autentica um usuário com email e senha
+      parameters:
+      - description: Email e Senha
+        in: body
+        name: credenciais
+        required: true
+        schema:
+          $ref: '#/definitions/models.Login'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Usuario'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Login de usuário
+      tags:
+      - Autenticação
+  /procedimentos:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Procedimento
+        in: body
+        name: procedimento
+        required: true
+        schema:
+          $ref: '#/definitions/models.Procedimento'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Procedimento'
+      summary: Criar procedimento
+      tags:
+      - Procedimentos
+  /procedimentos/{id}:
+    delete:
+      parameters:
+      - description: ID do procedimento
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Deletar procedimento
+      tags:
+      - Procedimentos
+    get:
+      parameters:
+      - description: ID do profissional
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Procedimento'
+            type: array
+      summary: Listar procedimentos por profissional
+      tags:
+      - Procedimentos
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID do procedimento
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Procedimento atualizado
+        in: body
+        name: procedimento
+        required: true
+        schema:
+          $ref: '#/definitions/models.Procedimento'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Atualizar procedimento
+      tags:
+      - Procedimentos
+  /upload/{tipo}/{id}:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Tipo do recurso (profissional ou procedimento)
+        in: path
+        name: tipo
+        required: true
+        type: string
+      - description: ID do recurso
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: URL da imagem
+        in: body
+        name: imagem
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.ImagemInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Atualizar imagem do recurso
+      tags:
+      - Upload
+swagger: "2.0"

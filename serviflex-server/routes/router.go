@@ -65,7 +65,10 @@ func SetupProcedimentoRoutes(rg *gin.RouterGroup) {
 
 func SetupHorarioRoutes(rg *gin.RouterGroup) {
 	rg.POST("/horarios", controllers.CriarHorario)
+	rg.PUT("/horarios/:id", controllers.EditarHorario)   // NOVA ROTA
+	rg.DELETE("/horarios/:id", controllers.ExcluirHorario) // NOVA ROTA
 }
+
 func SetupUploadRoutes(rg *gin.RouterGroup) {
 	rg.PUT("/upload/:tipo/:id", controllers.SetImagemURL) // tipo = profissional | procedimento
 }

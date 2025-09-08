@@ -86,6 +86,57 @@ func CriarHorario(c *gin.Context) {
 	})
 }
 
+// EditarHorario permite atualizar um horário existente
+func EditarHorario(c *gin.Context) {
+	id := c.Param("id")
+	var input models.Horario
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Dados inválidos"})
+		return
+	}
+	ctx := context.Background()
+	client, err := config.App.Firestore(ctx)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao conectar com Firestore"})
+		return
+	}
+	defer client.Close()
+
+	docRef := client.Collection("horarios").Doc(id)
+	_, err = docRef.Get(ctx)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Horário não encontrado"})
+		return
+	}
+
+	// Atualiza apenas os campos principais
+	_, err = docRef.Set(ctx, input)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao atualizar horário"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Horário atualizado com sucesso"})
+}
+
+// ExcluirHorario remove um horário do profissional
+func ExcluirHorario(c *gin.Context) {
+	id := c.Param("id")
+	ctx := context.Background()
+	client, err := config.App.Firestore(ctx)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao conectar com Firestore"})
+		return
+	}
+	defer client.Close()
+
+	_, err = client.Collection("horarios").Doc(id).Delete(ctx)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao excluir horário"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "Horário excluído com sucesso"})
+}
+
 // ListarHorariosPorProfissional lista os horários de atendimento do profissional
 // @Summary Listar horários por profissional
 // @Tags Horários
@@ -301,7 +352,7 @@ func ListarConvitesPendentes(c *gin.Context) {
 
     docs, err := client.Collection("notificacoes").
         Where("paraUid", "==", uid).
-        Where("tipo", "==", "conviteestabelecimento").
+        Where("tipo", "==", "convite_estabelecimento").
         Where("respondido", "==", false).
         Documents(ctx).GetAll()
     if err != nil {
@@ -311,12 +362,12 @@ func ListarConvitesPendentes(c *gin.Context) {
 
     // Struct de resposta incluindo o ID da notificação
     type NotificacaoComID struct {
-        ID                string      json:"id"
+        ID                string      `json:"id"`
         models.Notificacao
     }
 
     var convites []NotificacaoComID
-    for , doc := range docs {
+    for _, doc := range docs {
         var n models.Notificacao
         if err := doc.DataTo(&n); err == nil {
             convites = append(convites, NotificacaoComID{

@@ -603,3 +603,51 @@ func RelatorioAgendamentosPorMesProfissional(c *gin.Context) {
 		"agendamentos_por_mes": contagem,
 	})
 }
+
+// ListarProfissionais retorna todos os profissionais
+func ListarProfissionais(c *gin.Context) {
+	ctx := context.Background()
+	client, err := config.App.Firestore(ctx)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao conectar"})
+		return
+	}
+	defer client.Close()
+
+	docs, err := client.Collection("profissionais").Documents(ctx).GetAll()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao buscar profissionais"})
+		return
+	}
+
+	var profissionais []models.Profissional
+	for _, doc := range docs {
+		var p models.Profissional
+		if err := doc.DataTo(&p); err == nil {
+			profissionais = append(profissionais, p)
+		}
+	}
+	c.JSON(http.StatusOK, profissionais)
+}
+
+// BuscarProfissionalPorID retorna um profissional por ID
+func BuscarProfissionalPorID(c *gin.Context) {
+	uid := c.Param("uid")
+	ctx := context.Background()
+	client, err := config.App.Firestore(ctx)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro ao conectar"})
+		return
+	}
+	defer client.Close()
+
+	doc, err := client.Collection("profissionais").Doc(uid).Get(ctx)
+	if err != nil || !doc.Exists() {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Profissional não encontrado"})
+		return
+	}
+
+	var p models.Profissional
+	doc.DataTo(&p)
+	c.JSON(http.StatusOK, p)
+}

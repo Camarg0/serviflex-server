@@ -8,4 +8,6 @@ type Admin struct {
 	Email    string    `json:"email" firestore:"email"`
 	Senha    string    `json:"senha" firestore:"senha"`
 	CriadoEm time.Time `json:"criadoEm" firestore:"criadoEm"`
+	Tipo	 string    `json:"tipo" firestore:"tipo"`
 }
+

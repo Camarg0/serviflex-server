@@ -19,6 +19,7 @@ func SetupRoutes(router *gin.Engine) {
 	SetupAgendamentoRoutes(api)
 	SetupUploadRoutes(api)
 	SetupEstabelecimentoRoutes(api)
+	SetupAdminRoutes(api) // ADICIONE ESTA LINHA
 
 }
 
@@ -75,4 +76,12 @@ func SetupUploadRoutes(rg *gin.RouterGroup) {
 
 func SetupAgendamentoRoutes(rg *gin.RouterGroup) {
 	rg.POST("/agendamentos", controllers.AgendarHorario)
+}
+
+func SetupAdminRoutes(rg *gin.RouterGroup) {
+	rg.GET("/admins", controllers.ListarAdmins)
+	rg.GET("/admins/:id", controllers.BuscarAdminPorID)
+	rg.POST("/admins", controllers.CriarAdmin)
+	rg.PUT("/admins/:id", controllers.EditarAdmin)
+	rg.DELETE("/admins/:id", controllers.ExcluirAdmin)
 }

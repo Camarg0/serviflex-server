@@ -51,6 +51,8 @@ func SetupProfissionalRoutes(rg *gin.RouterGroup) {
 	rg.GET("/agendamentos/profissional/:id", controllers.ListarAgendamentosPorProfissional)
 	rg.GET("/horarios/:id", controllers.ListarHorariosPorProfissional)
 	rg.GET("/profissionais/:uid/convites-pendentes", controllers.ListarConvitesPendentes)
+	rg.GET("/profissionais", controllers.ListarProfissionais)         // NOVA ROTA
+	rg.GET("/profissionais/:uid", controllers.BuscarProfissionalPorID) // NOVA ROTA
 	rg.GET("/relatorios/profissional/faturamento/:id", controllers.RelatorioFaturamentoProfissional)
 	rg.GET("/relatorios/avaliacoes/profissional/:id", controllers.RelatorioAvaliacoesPorProfissional)
 	rg.GET("/relatorios/agendamentos/profissional/:id", controllers.RelatorioAgendamentosPorMesProfissional)
